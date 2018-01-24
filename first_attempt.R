@@ -6,18 +6,16 @@ library(ggplot2)
 
 setwd('~/codez/hubway/')
 
-trips <- read.csv('data/201706-hubway-tripdata.csv')
+trips <- read.csv('data/201706-hubway-tripdata.csv', stringsAsFactors=FALSE)
 
 addAges <- function(df) {
   return (df %>%
-    mutate(age=as.numeric(as.character(birth.year))) %>%
-    filter(!is.na(age)) %>%
-    mutate(age = 2017 - age) %>%
+    filter(birth.year != '\\N') %>%
+    mutate(age = 2017 - as.numeric(birth.year)) %>%
     filter(age < 100))
 }
 
 by_age <- group_by(addAges(trips), age)
-
 summary <- summarize(by_age, avg_duration = mean(tripduration), n = n())
 
 qplot(age,
