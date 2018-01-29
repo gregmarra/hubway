@@ -4,8 +4,6 @@
 library(dplyr)
 library(ggplot2)
 
-setwd('~/codez/hubway/')
-
 trips <- read.csv('data/201706-hubway-tripdata.csv', stringsAsFactors=FALSE)
 
 addAges <- function(df) {
@@ -15,14 +13,25 @@ addAges <- function(df) {
     filter(age < 100))
 }
 
-by_age <- group_by(addAges(trips), age)
-summary <- summarize(by_age, avg_duration = mean(tripduration), n = n())
-
-qplot(age,
-      n,
-      color = avg_duration,
-      data = summary,
-      xlab = "Age",
-      ylab = "Number of Rides",
-      main = "Hubway is most used by people between the ages of 20 and 40")
+trips %>%
+  addAges() %>%
+  group_by(age) %>%
+  summarize(
+    n = n(),
+    mean_tripduration = mean(tripduration)
+  ) %>%
+  ggplot(aes(
+    x = age,
+    y = n,
+    fill = mean_tripduration
+  )) +
+  geom_col() +
+  labs(
+    x = "Age",
+    y = "Number of Rides",
+    fill = "Mean Trip Duration (s)",
+    title = "Young Riders Dominate",
+    subtitle = "Hubway is most used by people between the ages of 20 and 40"
+  )
+ggsave("./output/rides_by_age.pdf")
 
