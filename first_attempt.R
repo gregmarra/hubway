@@ -43,7 +43,7 @@ trips %>%
        fill = "Mean Trip Duration (s)",
        title = "Young Riders Dominate",
        subtitle = "Hubway is most used by people between the ages of 20 and 40")
-ggsave("rides_by_age.pdf")
+ggsave("rides_by_age.png")
 
 ## Time of Day
 
@@ -68,7 +68,7 @@ trips %>%
   geom_freqpoly(bins = 48) +
   labs(title = "Young people get going later and stay out later",
        subtitle = "Young = 0-22, Middle = 22-45, Old = 45+")
-ggsave("ride_times_by_age_bucket.pdf")
+ggsave("ride_times_by_age_bucket.png")
 
 ## Day of Week
 trips %>%
@@ -100,7 +100,7 @@ trips %>%
     title = "Weekends and Weekdays Differ",
     subtitle = "Weekdays show clear commute spikes; weekends higher afternoon usage."
   )
-ggsave("times_by_day_of_week.pdf")
+ggsave("times_by_day_of_week.png")
 
 ## Station Station Pairs
 
