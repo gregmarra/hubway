@@ -32,39 +32,43 @@ addTimes <- function(df) {
 trips %>%
   addAges() %>%
   group_by(age) %>%
-  summarize(
-    n = n(),
-    mean_tripduration = mean(tripduration)
-  ) %>%
-  ggplot(aes(
-    x = age,
-    y = n,
-    fill = mean_tripduration
-  )) +
+  summarize(n = n(),
+            mean_tripduration = mean(tripduration)) %>%
+  ggplot(aes(x = age,
+             y = n,
+             fill = mean_tripduration)) +
   geom_col() +
-  labs(
-    x = "Age",
-    y = "Number of Rides",
-    fill = "Mean Trip Duration (s)",
-    title = "Young Riders Dominate",
-    subtitle = "Hubway is most used by people between the ages of 20 and 40"
-  )
+  labs(x = "Age",
+       y = "Number of Rides",
+       fill = "Mean Trip Duration (s)",
+       title = "Young Riders Dominate",
+       subtitle = "Hubway is most used by people between the ages of 20 and 40")
 ggsave("rides_by_age.pdf")
 
 ## Time of Day
 
 trips %>%
   addTimes() %>%
-  mutate(
-    start_hour = update(starttime, yday = 1),
-    stop_hour = update(stoptime, yday = 1)
-  ) %>%
-  ggplot(aes(
-    x = start_hour
-  )) +
-  geom_histogram(
-    bins = 192
-  )
+  mutate(start_hour = update(starttime, yday = 1),
+         stop_hour = update(stoptime, yday = 1)) %>%
+  ggplot(aes(x = start_hour)) +
+  geom_histogram(bins = 192)
+
+trips %>%
+  addTimes() %>%
+  addAges() %>%
+  mutate(start_hour = update(starttime, yday = 1),
+         stop_hour = update(stoptime, yday = 1)) %>%
+  mutate(age_bucket = cut(age,
+                          breaks=c(-Inf, 22, 45, Inf),
+                          labels=c("young","middle","old"))) %>%
+  ggplot(aes(x = start_hour,
+             y = ..density..,
+             color = age_bucket)) +
+  geom_freqpoly(bins = 48) +
+  labs(title = "Young people get going later and stay out later",
+       subtitle = "Young = 0-22, Middle = 22-45, Old = 45+")
+ggsave("ride_times_by_age_bucket.pdf")
 
 ## Day of Week
 trips %>%
@@ -92,8 +96,21 @@ trips %>%
   labs(
     x = "Trip Start",
     y = "Number of Rides",
+    color = "Weekday",
     title = "Weekends and Weekdays Differ",
-    subtitle = "Weekdays show clear commute spikes; weekends higher afternoon usage"
+    subtitle = "Weekdays show clear commute spikes; weekends higher afternoon usage."
   )
 ggsave("times_by_day_of_week.pdf")
 
+## Station Station Pairs
+
+trips %>%
+  count(start.station.name, end.station.name, sort = TRUE) %>%
+  top_n(10, n)
+# %>%
+#   ggplot(aes(
+#     x = start.station.name,
+#     y = end.station.name,
+#     fill = n
+#   )) +
+#   geom_bin2d()
